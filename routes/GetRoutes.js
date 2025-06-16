@@ -1,13 +1,15 @@
 // routes/GetRoutes.js
 const express = require("express");
 const router = express.Router();
+const jwt = require("jsonwebtoken");
+
 const User = require("../models/User");
 
 // Route to get all users
 router.get("/getall", async (req, res) => {
   try {
     // Fetch all users from the database
-    const users = await User.find().select("_id name ");
+    const users = await User.find().select("_id name email");
 
     // Check if no users are found
     if (users.length === 0) {

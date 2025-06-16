@@ -1,21 +1,29 @@
 const dotenv = require("dotenv");
-const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const router = express.Router();
+
+const express = require("express");
 const app = express();
+
 const connectDB = require("../DbConfig.js");
 
 const User = require("../models/User");
+
+connectDB;
+dotenv.config();
+
+//More middleware:
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 
 //Routes
 const getRoutes = require("../routes/GetRoutes.js");
 const postRoutes = require("../routes/PostRoutes.js");
 
-connectDB;
-dotenv.config();
-app.use(express.json());
+const protectedGetRoutes = require("../routes/ProtectedGetRoutes.js");
+const protectedPostRoutes = require("../routes/ProtectedPostRoutes.js");
+
 
 app.use(
   cors({
@@ -25,8 +33,11 @@ app.use(
 );
 
 //Routes and controllers
-app.use("/getprojects", getRoutes); 
-app.use("/postprojects", postRoutes);
+app.use("/getroutes", getRoutes); 
+app.use("/postroutes", postRoutes);
+
+app.use("/api/get", protectedGetRoutes);
+app.use("/api/post", protectedPostRoutes);
 
 
 // Test
