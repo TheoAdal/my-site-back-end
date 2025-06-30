@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const checkToken = require('../middleware/checkToken');
 
+//AUTH: Logout user
 router.post("/user/logout", checkToken, async (req, res) => {
   try {
     const user = req.user;

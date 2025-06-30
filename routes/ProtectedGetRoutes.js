@@ -6,9 +6,10 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const checkToken = require('../middleware/checkToken');
 
+//AUTH: Token check
 router.get("/user/token", checkToken, (req, res) => {
     res.json({
-        message: "Successful log in",
+        message: "Token check was succesfull",
         authorizedData: req.user,
     });
 });
