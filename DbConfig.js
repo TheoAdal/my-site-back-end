@@ -26,3 +26,31 @@ function connectDB() {
 
 module.exports = connectDB();
 
+
+
+
+
+
+
+
+// async function dropTokenUniqueIndex() {
+//   const url = `mongodb+srv://${process.env.USER}:${process.env.PASS}@cluster0.tfj07bt.mongodb.net/${process.env.DBNAME}?retryWrites=true&w=majority&appName=Cluster0`;
+//   await mongoose.connect(url); // replace with your URI
+
+//   const userCollection = mongoose.connection.collection("users");
+
+//   try {
+//     await userCollection.dropIndex("token_1");
+//     console.log("Dropped unique index on token field.");
+//   } catch (err) {
+//     if (err.codeName === "IndexNotFound") {
+//       console.log("Index not found, nothing to drop.");
+//     } else {
+//       console.error("Error dropping index:", err);
+//     }
+//   }
+
+//   await mongoose.disconnect();
+// }
+
+// dropTokenUniqueIndex();

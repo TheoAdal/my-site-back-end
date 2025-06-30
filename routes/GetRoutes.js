@@ -9,12 +9,12 @@ const User = require("../models/User");
 router.get("/getall", async (req, res) => {
   try {
     // Fetch all users from the database
-    const users = await User.find().select("_id name email");
+    const users = await User.find().select("_id name email password");
 
     // Check if no users are found
     if (users.length === 0) {
       return res.status(404).send("No User Found");
-    }
+    } 
 
     // Send the found users
     res.send(users);

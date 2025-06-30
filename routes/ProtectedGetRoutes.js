@@ -13,7 +13,7 @@ router.get("/user/token", checkToken, (req, res) => {
     });
 });
 
-// Route to get all users with Authorisation
+//AUTH: Route to get all users 
 router.get("/user/getall", checkToken, async (req, res) => {
   try {
     // Fetch all users from the database

@@ -40,7 +40,7 @@ app.use("/api/get", protectedGetRoutes);
 app.use("/api/post", protectedPostRoutes);
 
 
-// Test
+// Test 
 app.get("/", (_req, res) => {
   res.send("<h1>Dont mind me, just checking in :)</h1>");
 });
