@@ -23,7 +23,7 @@ const postRoutes = require("../routes/PostRoutes.js");
 
 const protectedGetRoutes = require("../routes/ProtectedGetRoutes.js");
 const protectedPostRoutes = require("../routes/ProtectedPostRoutes.js");
-
+const protectedPatchRoutes = require("../routes/ProtectedPatchRoutes.js");
 
 app.use(
   cors({
@@ -38,6 +38,7 @@ app.use("/postroutes", postRoutes);
 
 app.use("/api/get", protectedGetRoutes);
 app.use("/api/post", protectedPostRoutes);
+app.use("/api/patch", protectedPatchRoutes);
 
 
 // Test 
