@@ -1,13 +1,10 @@
 const dotenv = require("dotenv");
-const mongoose = require("mongoose");
 const cors = require("cors");
 
 const express = require("express");
 const app = express();
 
 const connectDB = require("../DbConfig.js");
-
-const User = require("../models/User");
 
 connectDB;
 dotenv.config();
@@ -41,12 +38,12 @@ app.use("/api/post", protectedPostRoutes);
 app.use("/api/patch", protectedPatchRoutes);
 
 
-// Test 
+//Test 
 app.get("/", (_req, res) => {
   res.send("<h1>Dont mind me, just checking in :)</h1>");
 });
 
-// Start the server
+//Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

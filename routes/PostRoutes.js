@@ -4,6 +4,8 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
+const sendEmail = require("../utilities/SendEmail");
+const sendPass = require("../utilities/SendPass");
 
 //Login route
 router.post("/user/login", async (req, res, next) => {
@@ -39,7 +41,7 @@ router.post("/user/login", async (req, res, next) => {
   }
 });
 
-//Register route
+//Register route || Add email verification
 router.post("/user/register", async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -55,6 +57,13 @@ router.post("/user/register", async (req, res) => {
 
     //Store user to DB
     await newUser.save();
+
+    //CREATE TOKEN VERIFICATION HERE
+    // const resetToken = crypto.randomBytes(20).toString("hex");
+    // const resetTokenExpiry = Date.now() + 3600000; // 1 hour from now
+
+    //CREATE VERIFICATION URL HERE
+    // const verificationUrl = `http://localhost:3000/reset-password/${resetToken}`;
 
     //Success message
     res.status(201).json({ message: "User registered successfully. Now add email verification theooooo" });
