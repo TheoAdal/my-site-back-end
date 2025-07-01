@@ -64,7 +64,7 @@ router.post("/user/register", async (req, res) => {
     const verificationToken = crypto.randomBytes(32).toString("hex");
 
     // Create verification link
-    const verificationLink = `http://localhost:3000/verify?token=${verificationToken}`;
+    const verificationLink = `http://localhost:3000/verify/${verificationToken}`;
 
     //Create new user
     const newUser = new User({
@@ -93,6 +93,42 @@ router.post("/user/register", async (req, res) => {
   }
 
   
+});
+
+router.post("/resend-verification", async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    //Find the user by email
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    //Check if already verified
+    if (user.isVerified) {
+      return res.status(400).json({ error: "Account already verified" });
+    }
+
+    //Generate a new token and expiry
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiry = Date.now() + 3600000; // 1 hour
+
+    user.verificationToken = token;
+    user.verificationTokenExpiry = expiry;
+
+    await user.save();
+
+    //Create verification link and send email
+    const verificationLink = `http://localhost:3000/verify/${token}`;
+    await sendEmail(user.email, verificationLink);
+
+    res.json({ message: "Verification email resent successfully" });
+  } catch (error) {
+    console.error("Resend error:", error);
+    res.status(500).json({ error: "Something went wrong" });
+  }
 });
 
 module.exports = router;
