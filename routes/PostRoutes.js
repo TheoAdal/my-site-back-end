@@ -2,6 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const User = require("../models/User");
 const sendEmail = require("../utilities/SendEmail");
@@ -25,9 +26,16 @@ router.post("/user/login", async (req, res, next) => {
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
+    if (!user.verified) {
+      return res
+        .status(403)
+        .json({ message: "Please verify your email before logging in." });
+    }
 
     //Create token if correct credentials
-    const token = jwt.sign({ user: { _id: user._id } }, "privatekey", { expiresIn: "1h" });
+    const token = jwt.sign({ user: { _id: user._id } }, "privatekey", {
+      expiresIn: "1h",
+    });
     user.token = token;
     user.tokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // create tokenExpiry with 1 hour expiry
     //Store it in the DB
@@ -52,25 +60,39 @@ router.post("/user/register", async (req, res) => {
       return res.status(409).json({ message: "Email already registered" });
     }
 
+    // Generate verification token
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+
+    // Create verification link
+    const verificationLink = `http://localhost:3000/verify?token=${verificationToken}`;
+
     //Create new user
-    const newUser = new User({ name, email, password });
+    const newUser = new User({
+      name,
+      email,
+      password, //hashed with pre-save in User model
+      verificationToken,
+      verificationTokenExpires: Date.now() + 3600000, // 1 hour
+    });
 
     //Store user to DB
     await newUser.save();
 
-    //CREATE TOKEN VERIFICATION HERE
-    // const resetToken = crypto.randomBytes(20).toString("hex");
-    // const resetTokenExpiry = Date.now() + 3600000; // 1 hour from now
+    try {
+      await sendEmail(newUser.email, verificationLink);
+      //Success message
+      return res.status(200).json({ message: "User registered successfully. Please check your email to verify." });
+    } catch (emailErr) {
+      console.error("Email not sent", emailErr);
+      return res.status(500).json({ message: "User created, but verification email failed." });
+    }
 
-    //CREATE VERIFICATION URL HERE
-    // const verificationUrl = `http://localhost:3000/reset-password/${resetToken}`;
-
-    //Success message
-    res.status(201).json({ message: "User registered successfully. Now add email verification theooooo" });
-  } catch (err) {
+  } catch (err) { 
     console.error("Registration error:", err);
     res.status(500).json({ message: "Server error" });
   }
+
+  
 });
 
 module.exports = router;

@@ -14,7 +14,7 @@ module.exports = async (email, verificationLink) => {
 		});
 
         const mailOptions = {
-            from: 'replace email here',
+            from: process.env.USER_EMAIL,
             to: email,  
             subject: "Verification Email",
             text: `Congragulations, and welcome to the MY-SITE team,\n\n
@@ -25,7 +25,7 @@ module.exports = async (email, verificationLink) => {
 		await transporter.sendMail(mailOptions);
 		console.log("Verification email sent successfully");
 	} catch (error) {
-		console.log("Failed to send verification email not sent!");
+		console.log("Failed to send verification email");
 		console.log(error);
 		return error;
 	}
