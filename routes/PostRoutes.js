@@ -19,17 +19,24 @@ router.post("/user/login", async (req, res, next) => {
     //Check Email
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({
+        message: "Invalid credentials",
+        code: "INVALID_CREDENTIALS",
+      });
     }
     //Check Password with "comparePassword" method from "User" model
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({
+        message: "Invalid credentials",
+        code: "INVALID_CREDENTIALS",
+      });
     }
     if (!user.verified) {
-      return res
-        .status(403)
-        .json({ message: "Please verify your email before logging in." });
+      return res.status(403).json({
+        message: "Please verify your email before logging in.",
+        code: "EMAIL_NOT_VERIFIED",
+      });
     }
 
     //Create token if correct credentials
@@ -41,11 +48,22 @@ router.post("/user/login", async (req, res, next) => {
     //Store it in the DB
     await user.save();
 
-    res.status(201).json({ message: "User logged in successfully. " });
-    res.json({ token });
+    return res.status(200).json({
+      message: "User logged in successfully",
+      access_token: token,
+      user: {
+        id: user._id,
+        name: user.name, // assuming you store it
+        email: user.email,
+        // role: user.role, // optional if you use roles
+      }
+    });
   } catch (err) {
     console.error("Login error:", err);
-    res.status(500).send("Server error");
+    return res.status(500).json({
+      message: "Internal server error",
+      code: "SERVER_ERROR",
+    });
   }
 });
 
