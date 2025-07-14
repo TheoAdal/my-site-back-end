@@ -109,8 +109,6 @@ router.post("/user/register", async (req, res) => {
     console.error("Registration error:", err);
     res.status(500).json({ message: "Server error" });
   }
-
-  
 });
 
 router.post("/resend-verification", async (req, res) => {
