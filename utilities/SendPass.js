@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-module.exports = async ({ email, resetLink }) => {
+module.exports = async ( email, resetLink ) => {
     try {
         const transporter = nodemailer.createTransport({
             host: process.env.HOST,
@@ -14,7 +14,7 @@ module.exports = async ({ email, resetLink }) => {
         });
 
         const mailOptions = {
-            from: 'replace email here',
+            from: process.env.USER_EMAIL,
             to: email,  
             subject: "Password Reset Request",
             text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n

@@ -18,6 +18,8 @@ app.use(express.urlencoded({ extended: true }));
 const getRoutes = require("../routes/GetRoutes.js");
 const postRoutes = require("../routes/PostRoutes.js");
 
+const tokenBasedRoutes = require("../routes/TokenBasedRoutes.js");
+
 const protectedGetRoutes = require("../routes/ProtectedGetRoutes.js");
 const protectedPostRoutes = require("../routes/ProtectedPostRoutes.js");
 const protectedPatchRoutes = require("../routes/ProtectedPatchRoutes.js");
@@ -33,9 +35,11 @@ app.use(
 app.use("/getroutes", getRoutes); 
 app.use("/postroutes", postRoutes);
 
-app.use("/api/get", protectedGetRoutes);
-app.use("/api/post", protectedPostRoutes);
-app.use("/api/patch", protectedPatchRoutes);
+app.use("/tokenbasedroutes", tokenBasedRoutes);         //Verification, Password Reset...
+
+app.use("/api/get", protectedGetRoutes);        //AUTH GET Routes
+app.use("/api/post", protectedPostRoutes);     //AUTH POST Routes
+app.use("/api/patch", protectedPatchRoutes);  //AUTH PATCH Routes
 
 
 //Test 

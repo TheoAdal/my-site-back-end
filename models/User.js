@@ -31,33 +31,33 @@ const userSchema = new mongoose.Schema({
   //   type: String,
   //   required: true
   // },
+  verified:{
+    type: Boolean,
+    default: false,
+  },
+  // SESSION, VERIFICATION & PASSWORD_RESET TOKENS BELOW //
   token: {
     type: String,
     default: null,
   },
-  tokenExpiry: { 
+  tokenExpiry: {
     type: Date, 
     default: null,
-  },
-  verified:{
-    type: Boolean,
-    default: false,
   },
   verificationToken: {
     type: String,
   },
   verificationTokenExpires: {
     type: Date,
-  }
-    
-  // resetPasswordToken: { // This will store the password reset token
-  //   type: String ,
-  //   required: false
-  // },
-  // resetPasswordExpires: { // This will store the expiry time of the token
-  //   type: Date ,
-  //   required: false
-  // },
+  },
+  resetPasswordToken: {
+    type: String ,
+    required: false
+  },
+  resetPasswordExpires: {
+    type: Date ,
+    required: false
+  },
 });
 
 //Before storing user cred, the password gets hashed
