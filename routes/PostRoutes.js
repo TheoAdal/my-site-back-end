@@ -53,9 +53,10 @@ router.post("/user/login", async (req, res, next) => {
       access_token: token,
       user: {
         id: user._id,
-        name: user.name, // assuming you store it
+        name: user.name, 
+        username: user.username, 
         email: user.email,
-        // role: user.role, // optional if you use roles
+        // role: user.role, 
       }
     });
   } catch (err) {
@@ -67,15 +68,20 @@ router.post("/user/login", async (req, res, next) => {
   }
 });
 
-//Register route || Add email verification
+//Register route 
 router.post("/user/register", async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, username, email, password } = req.body;
 
   try {
     //Check if email is used
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ message: "Email already registered" });
+    }
+    //Check if email is used
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      return res.status(409).json({ message: "Username is taken" });
     }
 
     // Generate verification token
@@ -87,6 +93,7 @@ router.post("/user/register", async (req, res) => {
     //Create new user
     const newUser = new User({
       name,
+      username,
       email,
       password, //hashed with pre-save in User model
       verificationToken,

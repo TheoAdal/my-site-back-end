@@ -33,22 +33,30 @@ router.get("/user/getall", checkToken, async (req, res) => {
   }
 });
 
-// router.get("/user/token", checkToken, (req, res) => {
-//   //verify the JWT token generated for the user
-//   jwt.verify(req.token, "privatekey", (err, authorizedData) => {
-//     if (err) {
-//       //If error send Forbidden (403)
-//       console.log("ERROR: Could not connect to the protected route");
-//       res.sendStatus(403);
-//     } else {
-//       //If token is successfully verified, we can send the autorized data
-//       res.json({
-//         message: "Successful log in",
-//         authorizedData,
-//       });
-//       console.log("SUCCESS: Connected to protected route");
-//     }
-//   });
-// });
+// //AUTH: Route to get 
+router.get("/user/:username", checkToken, async (req, res) => {
+  try {
+    const profileUser = await User.findOne({ username: req.params.username }).select("_id name username email ");
+
+    if (!profileUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if the logged-in user is visiting their own profile
+    const isOwner = req.user && req.user.id === profileUser._id.toString();
+
+    // Return only public fields + ownership flag
+    res.json({
+      name: profileUser.name,
+      username: profileUser.username,
+      isOwner,
+      ...(isOwner ? { email: profileUser.email } : {}) // include email only if it's their own
+    });
+  } catch (err) {
+    console.error("Profile fetch error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 
 module.exports = router;
