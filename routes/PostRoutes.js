@@ -5,8 +5,9 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
 const User = require("../models/User");
+
 const sendEmail = require("../utilities/SendEmail");
-const sendPass = require("../utilities/SendPass");
+const sendContact = require("../utilities/SendContact");
 
 //Login route
 router.post("/user/login", async (req, res, next) => {
@@ -79,7 +80,7 @@ router.post("/user/register", async (req, res) => {
     if (existingUser) {
       return res.status(409).json({ message: "Email already registered", code: "EMAIL_TAKEN" });
     }
-    //Check if email is used
+    //Check if username is used
     const existingUsername = await User.findOne({ username });
     if (existingUsername) {
       return res.status(409).json({ message: "Username is taken", code: "USERNAME_TAKEN" });
@@ -119,7 +120,24 @@ router.post("/user/register", async (req, res) => {
   }
 });
 
+//Contact route 
+router.post("/user/contact", async (req, res) => {
+  const { name, email, text } = req.body;
 
+  // Basic validation
+  if (!name || !email || !text) {
+    return res.status(400).json({message: "Name, email, and text are required", code: "CONTACT_MISSING_FIELDS",});
+  }
+
+  try {
+    await sendContact(process.env.USER_EMAIL, name, email, text);
+
+    return res.status(200).json({message: "Email sent successfully", code: "EMAIL_SENT",});
+  } catch (emailErr) {
+    console.error("Email not sent", emailErr);
+    return res.status(500).json({message: "Failed to send contact email", code: "EMAIL_FAILED",});
+  }
+});
 
 
 module.exports = router;
