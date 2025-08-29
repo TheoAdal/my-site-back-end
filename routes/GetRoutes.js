@@ -12,14 +12,14 @@ router.get("/getall", async (req, res) => {
 
     // Check if no users are found
     if (users.length === 0) {
-      return res.status(404).send("No User Found");
+      return res.status(404).json({message: "User not found", code: "USER_NOT_FOUND"});
     } 
 
     // Send the found users
     res.send(users);
   } catch (err) {
     console.error("Error fetching all users:", err); 
-    res.status(500).send("Internal Server Error");
+    res.status(500).json({message: "Internal Server Error", code:"INTERNAL_SERVER_ERROR"});
   }
 });
 

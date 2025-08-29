@@ -9,6 +9,7 @@ const checkToken = require('../middleware/checkToken');
 //AUTH: Token check
 router.get("/user/token", checkToken, (req, res) => {
     res.json({
+        code:"TOKEN_CHECK_SUCCESFULL",
         message: "Token check was succesfull",
         authorizedData: req.user,
     });
@@ -22,14 +23,14 @@ router.get("/user/getall", checkToken, async (req, res) => {
 
     // Check if no users are found
     if (users.length === 0) {
-      return res.status(404).send("No User Found");
+      return res.status(404).json({message: "User not found", code: "USER_NOT_FOUND"});
     }
 
     // Send the found users
     res.send(users);
   } catch (err) {
     console.error("Error fetching all users:", err); 
-    res.status(500).send("Internal Server Error");
+    res.status(500).json({message: "Internal Server Error", code:"INTERNAL_SERVER_ERROR"});
   }
 });
 
@@ -39,7 +40,7 @@ router.get("/user/:username", checkToken, async (req, res) => {
     const profileUser = await User.findOne({ username: req.params.username }).select("_id name username email ");
 
     if (!profileUser) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({message: "User not found", code: "USER_NOT_FOUND"});
     }
 
     // Check if the logged-in user is visiting their own profile
@@ -54,7 +55,7 @@ router.get("/user/:username", checkToken, async (req, res) => {
     });
   } catch (err) {
     console.error("Profile fetch error:", err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", code:"SERVER_ERROR"});
   }
 });
 

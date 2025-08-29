@@ -16,7 +16,7 @@ router.post("/user/logout", checkToken, async (req, res) => {
     res.json({ message: "Logged out successfully" });
   } catch (err) {
     console.error("Logout error:", err);
-    res.status(500).send("Logout failed");
+    res.status(500).json({message: "Logout was unsuccesfull", code:"LOGOUT_FAILED"});
   }
 });
 
