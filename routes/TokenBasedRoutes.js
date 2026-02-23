@@ -13,7 +13,7 @@ router.get("/verify", async (req, res) => {
   const { token } = req.query;
 
   if (!token) {
-    return res.status(400).json({ message: "Missing verification token" });
+    return res.status(400).json({ message: "Missing verification token", code:"MISSING_VERIFICATION_TOKEN" });
   }
 
   try {
@@ -23,7 +23,7 @@ router.get("/verify", async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid or expired verification token" });
+      return res.status(400).json({ message: "Invalid or expired verification token", code:"INVALID||EXPIRED_VERIFICATION_TOKEN" });
     }
 
     user.verified = true;
@@ -32,10 +32,10 @@ router.get("/verify", async (req, res) => {
 
     await user.save();
 
-    res.status(200).json({ message: "Email verified successfully. You can now log in." });
+    res.status(200).json({ message: "Email verified successfully. You can now log in.", code:"EMAIL_VERIFIED" });
   } catch (err) {
     console.error("Email verification error:", err);
-    res.status(500).json({ message: "Server error during verification" });
+    res.status(500).json({ message: "Server error during verification", code:"SERVER_ERROR" });
   }
 });
 
@@ -48,12 +48,12 @@ router.post("/resend-verification", async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({message: "User not found", code: "USER_NOT_FOUND"});
     }
 
     //Check if already verified
     if (user.isVerified) {
-      return res.status(400).json({ error: "Account already verified" });
+      return res.status(400).json({ error: "Account already verified", code:"ACCOUNT_ALREADY_VERIFIED" });
     }
 
     //Generate a new token and expiry
@@ -72,7 +72,7 @@ router.post("/resend-verification", async (req, res) => {
     res.json({ message: "Verification email resent successfully" });
   } catch (error) {
     console.error("Resend error:", error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({message: "Internal Server Error", code:"INTERNAL_SERVER_ERROR"});
   }
 });
 
@@ -85,7 +85,7 @@ router.post("/forgot-password", async (req, res) => {
 
     if (!user) {
       return res.status(404).json({
-        message: "There is no account with this email",
+        message: "There is no account with this email", code:"USER_EMAIL_NOT_FOUND"
       });
     }
 
@@ -106,11 +106,11 @@ router.post("/forgot-password", async (req, res) => {
     await sendPass(user.email, resetLink);
 
     return res.status(200).json({
-      message: "Reset Password email sent successfully",
+      message: "Reset Password email sent successfully", code:"RESET_EMAIL_SENT"
     });
   } catch (error) {
     console.error("Email error:", error);
-    return res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({message: "Internal Server Error", code:"INTERNAL_SERVER_ERROR"});
   }
 });
 
@@ -126,9 +126,7 @@ router.patch("/reset-password/:token", async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).json({
-        message: "Password reset token is invalid or has expired.",
-      });
+      return res.status(400).json({ message: "Invalid or expired password reset token", code:"INVALID||EXPIRED_RESET_TOKEN" });
     }
 
     user.password = password;
@@ -138,12 +136,12 @@ router.patch("/reset-password/:token", async (req, res) => {
     await user.save(); 
 
     return res.status(200).json({
-      message: "Your password has been successfully reset.",
+      message: "Your password has been successfully reset.", code:"PASSWORD_RESET"
     });
   } catch (err) {
     console.error("Error resetting password:", err);
     return res.status(500).json({
-      message: "Server error while resetting password.",
+      message: "Server error while resetting password.", code:"INTERNAL_SERVER_ERROR"
     });
   }
 });

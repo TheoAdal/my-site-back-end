@@ -24,7 +24,7 @@ router.patch("/update/:id", checkToken, isOwnerByUsername, async (req, res) => {
     );
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({message: "User not found", code: "USER_NOT_FOUND"});
     }
 
     res.json({
@@ -37,7 +37,7 @@ router.patch("/update/:id", checkToken, isOwnerByUsername, async (req, res) => {
     });
   } catch (err) {
     console.error("Update error:", err);
-    res.status(400).json({ message: "Failed to update profile", error: err.message });
+    res.status(400).json({ message: "Failed to update profile", code:"PROFILE_UPDATE_FAILED", error: err.message });
   }
 });
 

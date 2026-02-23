@@ -5,8 +5,9 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
 const User = require("../models/User");
+
 const sendEmail = require("../utilities/SendEmail");
-const sendPass = require("../utilities/SendPass");
+const sendContact = require("../utilities/SendContact");
 
 //Login route
 router.post("/user/login", async (req, res, next) => {
@@ -50,6 +51,7 @@ router.post("/user/login", async (req, res, next) => {
 
     return res.status(200).json({
       message: "User logged in successfully",
+      code: "USER_LOGGED_IN",
       access_token: token,
       user: {
         id: user._id,
@@ -76,12 +78,12 @@ router.post("/user/register", async (req, res) => {
     //Check if email is used
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(409).json({ message: "Email already registered" });
+      return res.status(409).json({ message: "Email already registered", code: "EMAIL_TAKEN" });
     }
-    //Check if email is used
+    //Check if username is used
     const existingUsername = await User.findOne({ username });
     if (existingUsername) {
-      return res.status(409).json({ message: "Username is taken" });
+      return res.status(409).json({ message: "Username is taken", code: "USERNAME_TAKEN" });
     }
 
     // Generate verification token
@@ -106,19 +108,36 @@ router.post("/user/register", async (req, res) => {
     try {
       await sendEmail(newUser.email, verificationLink);
       //Success message
-      return res.status(200).json({ message: "User registered successfully. Please check your email to verify." });
+      return res.status(200).json({ message: "User registered successfully. Please check your email to verify.", code: "EMAIL_REGISTERED_EMAIL_SENT" });
     } catch (emailErr) {
       console.error("Email not sent", emailErr);
-      return res.status(500).json({ message: "User created, but verification email failed." });
+      return res.status(500).json({ message: "User created, but verification email failed.", code: "EMAIL_REGISTERED_EMAIL_NOT_SENT"});
     }
 
   } catch (err) { 
     console.error("Registration error:", err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", code: "SERVER_ERROR" });
   }
 });
 
+//Contact route 
+router.post("/user/contact", async (req, res) => {
+  const { name, email, text } = req.body;
 
+  // Basic validation
+  if (!name || !email || !text) {
+    return res.status(400).json({message: "Name, email, and text are required", code: "CONTACT_MISSING_FIELDS",});
+  }
+
+  try {
+    await sendContact(process.env.USER_EMAIL, name, email, text);
+
+    return res.status(200).json({message: "Email sent successfully", code: "EMAIL_SENT",});
+  } catch (emailErr) {
+    console.error("Email not sent", emailErr);
+    return res.status(500).json({message: "Failed to send contact email", code: "EMAIL_FAILED",});
+  }
+});
 
 
 module.exports = router;
